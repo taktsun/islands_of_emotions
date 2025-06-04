@@ -1,0 +1,1 @@
+This folder is needed for the output files which the descriptive statistics and analysis R scripts produce.
