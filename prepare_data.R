@@ -15,6 +15,8 @@ library(dplyr)
 library(esmpack) # for the lagvar function
 library(betapart)
 
+filepathEMOTE <- 'temp/data_downloads_C7SC6HWU8R_2025-04-01Leuven_3-wave_longitudinal_study.csv'
+
 # ===========================================================================
 # List the negative emotion items we are interested in
 # ===========================================================================
@@ -39,7 +41,6 @@ if (file.exists(filepathEMOTE)){
 # However, the full dataset contains 6 negative emotions.
 # We have requested the 6 negative emotion items from EMOTE under data request code "C7SC6HWU8R"
 # with which you can request the same dataset from EMOTE (https://emotedatabase.com/)
-filepathEMOTE <- 'temp/data_downloads_C7SC6HWU8R_2025-04-01Leuven_3-wave_longitudinal_study.csv'
 bInternet <- is.character(getURL("github.com"))
 if (bInternet){
   source("https://github.com/taktsun/dissimilarity-for-ESM-data/raw/main/BrayCurtisDissimilarity_Calculate.R")
