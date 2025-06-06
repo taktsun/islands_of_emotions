@@ -45,7 +45,7 @@ bInternet <- is.character(getURL("github.com"))
 if (bInternet){
   source("https://github.com/taktsun/dissimilarity-for-ESM-data/raw/main/BrayCurtisDissimilarity_Calculate.R")
 }else{
-  source("local_BrayCurtisDissimilarity_Calculate.R")
+  source("temp/BrayCurtisDissimilarity_Calculate.R")
 }
 
 bInternet <- is.character(getURL("osf.io"))
