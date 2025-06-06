@@ -80,16 +80,16 @@ And put it to the temp folder.
 
 Also download three OSF datasets and rename them as BData1.sav, BData2.sav, and BData3.sav correspondingly. Put them under the temp folder.
 
-Dataset 1: https://osf.io/download/w8y33/
-Dataset 2: https://osf.io/download/gm52c/
-Dataset 3: https://osf.io/download/uvqjh/ 
+- Dataset 1: https://osf.io/download/w8y33/
+- Dataset 2: https://osf.io/download/gm52c/
+- Dataset 3: https://osf.io/download/uvqjh/ 
 
 Finally, download the EMOTE Dataset 3 (Full items): http://emotedatabase.com/requestid/C7SC6HWU8R (Request code: C7SC6HWU8R; parent dataset: https://emotedatabase.com/datasets/22/)
-Also put them in the temp folder.
+Also put it in the temp folder.
 
 ## ^Step 4 troubleshooting 
 
-Some university devices may have copies of RStudio that has problem with completing the restore() command. You may encounter this:
+Some university devices may restrict (system) folder access or provide  copies of RStudio that create problems with completing the restore() command. You may encounter this:
 	
 
 	    ERROR: compilation failed for package 'MASS'
