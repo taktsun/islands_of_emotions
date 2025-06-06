@@ -59,7 +59,7 @@ Reproduce the results by these steps.
 		renv::consent(provided = TRUE)
 		
  3. [Clone](https://resources.github.com/github-and-rstudio/#:~:text=Clone%20the%20repository%20with%20RStudio&text=On%20GitHub%2C%20navigate%20to%20the,RStudio%20on%20your%20local%20environment.) this repo (https://github.com/taktsun/islands_of_emotions) to your RStudio
- 4. Restore the package dependencies
+ 4. Restore the package dependencies^
 	
 
 	    renv::restore()
@@ -72,6 +72,37 @@ Reproduce the results by these steps.
 	- descriptive_statistics.R 
 	- analysis.R 
 All the scripts has accommodated the (un)availability of Dataset 3 from EMOTE. If it doesn't detect the dataset (data_downloads_C7SC6HWU8R_2025-04-01Leuven_3-wave_longitudinal_study.csv) in folder temp, it will automatically use the OSF-hosted version to reproduce the results.
+
+## What if I want to run the codes offline?
+
+Please download this file: https://github.com/taktsun/dissimilarity-for-ESM-data/raw/main/BrayCurtisDissimilarity_Calculate.R
+And put it to the temp folder.
+
+Also download three OSF datasets and rename them as BData1.sav, BData2.sav, and BData3.sav correspondingly. Put them under the temp folder.
+
+Dataset 1: https://osf.io/download/w8y33/
+Dataset 2: https://osf.io/download/gm52c/
+Dataset 3: https://osf.io/download/uvqjh/ 
+
+Finally, download the EMOTE Dataset 3 (Full items): http://emotedatabase.com/requestid/C7SC6HWU8R (Request code: C7SC6HWU8R; parent dataset: https://emotedatabase.com/datasets/22/)
+Also put them in the temp folder.
+
+## ^Step 4 troubleshooting 
+
+Some university devices may have copies of RStudio that has problem with completing the restore() command. You may encounter this:
+	
+
+	    ERROR: compilation failed for package 'MASS'
+	    * removing '[certain file path]'
+	    install of package 'MASS' failed [error code 1]
+	    
+If this happens, run these in addition to what described in step 4:
+	
+
+	    install.packages("remotes")
+	    remotes::install_github("wviechtb/esmpack")
+	    install.packages()	    
+
 
 ## Adherence to WORCS
 
