@@ -65,13 +65,13 @@ Reproduce the results by these steps.
 	    renv::restore()
 	    
 	    
- 5. Download 2 raw datasets from EMOTE (http://emotedatabase.com/requestid/C7SC6HWU8R) to folder temp.  
+ 5. Download the raw dataset from EMOTE (http://emotedatabase.com/requestid/C7SC6HWU8R) to folder temp. 
  6. Run 3 R scripts in the below sequence to reproduce the results.
  
 	- prepare_data.R 
 	- descriptive_statistics.R 
 	- analysis.R 
-All the scripts has accommodated the (un)availability of Dataset 3 from EMOTE. If it doesn't detect the dataset in folder temp, it will automatically use the OSF-hosted version to reproduce the results.
+All the scripts has accommodated the (un)availability of Dataset 3 from EMOTE. If it doesn't detect the dataset (data_downloads_C7SC6HWU8R_2025-04-01Leuven_3-wave_longitudinal_study.csv) in folder temp, it will automatically use the OSF-hosted version to reproduce the results.
 
 ## Adherence to WORCS
 
