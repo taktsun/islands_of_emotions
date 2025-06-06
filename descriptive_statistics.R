@@ -138,7 +138,6 @@ desstat_item <- rbind(
   do.call(rbind, lapply(inputEmotions3, dynamicdesstate, df.3))
   
 )
-write.csv(desstat_all,"manuscript/results/desstat_Table2_part1.csv")
 write.csv(desstat_item,"manuscript/results/desstat_TableS4_part1.csv")
 
 
