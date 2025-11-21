@@ -1,7 +1,13 @@
+# Descriptive Statistics
+# Only run this after running "prepare_data.R"!
+
 library(dplyr)
 library(misty) # for calculating ICC in descriptive statistics
 library(psych) # multilevel correlation
 library(multilevelTools) # for omega reliability
+library(ggplot2)
+library(tidyr)
+library(viridis)   # for scale_color_viridis_d()
 
 #============================
 # Descriptive statistics: Age, Gender, and how many people are above CES-D cutoffs?
@@ -237,3 +243,98 @@ outputReliability <- rbind(omega_NA_SM_1$Results,
                            omega_NA_SM_3$Results)
 write.csv(outputReliability, "manuscript/results/methods_measures_omegaReliability_ESM.csv", row.names=FALSE)
 
+#============================
+# Figure 2
+#============================
+
+df.2$moment_NAdiff <- df.2$moment_NA - lagvar(moment_NA, id=ppnr, obs=triggerid, data=df.2)
+
+realeggraph_subset <- df.2[2359:2361, ] %>%
+  mutate(
+    Average = rowMeans(across(c(ANGRY, SAD, ANX, DEPRE)), na.rm = TRUE)
+  )
+interval_labels <- realeggraph_subset %>%
+  mutate(
+    x_mid = (triggerid + lag(triggerid)) / 2,   # midpoint between this and previous
+    y_mid = 10,
+    label = paste0("ΔI = ", ifelse(moment_NAdiff>0,"+",""),sprintf("%.1f", moment_NAdiff),      # NAdiff, 2 decimals
+                   "\nΔT = ", sprintf("%.1f", BrayCurtisRepl.suc))
+  ) %>%
+  filter(!is.na(x_mid))   # remove first row since no previous interval
+
+# pivot to long format for the 4 emotion lines
+realeggraph_long <- realeggraph_subset %>%
+  pivot_longer(
+    cols = c(ANGRY, SAD, ANX, DEPRE),
+    names_to = "Emotion",
+    values_to = "Score"
+  )
+
+
+ggplot() +
+  # four emotion lines
+  geom_line(
+    data = realeggraph_long,
+    aes(x = triggerid, y = Score, color = Emotion, group = Emotion),
+    linewidth = 1
+  ) +
+  geom_point(
+    data = realeggraph_long,
+    aes(x = triggerid, y = Score, color = Emotion),
+    size = 2
+  ) +
+  # average line
+  geom_line(
+    data = realeggraph_subset,
+    aes(x = triggerid, y = Average, color = "Overall Intensity"),
+    linewidth = 2
+  ) +
+  geom_point(
+    data = realeggraph_subset,
+    aes(x = triggerid, y = Average, color = "Overall Intensity"),
+    size = 3
+  ) +
+  scale_color_manual(
+    name = "Emotion",
+    values = c(
+      "ANGRY" = viridis(5, option = "plasma")[1],
+      "SAD"   = viridis(5, option = "plasma")[2],
+      "ANX"   = viridis(5, option = "plasma")[3],
+      "DEPRE" = viridis(5, option = "plasma")[4],
+      "Overall Intensity" = "black"
+    ),
+    labels = c(
+      "ANGRY" = "Angry",
+      "SAD"   = "Sad",
+      "ANX"   = "Anxious",
+      "DEPRE" = "Depressed",
+      "Overall Intensity" = "Overall Intensity"
+    ),
+    breaks = c("ANGRY", "SAD", "ANX", "DEPRE", "Overall Intensity")
+  ) +
+  ylim(0, 50)+
+  scale_x_continuous(breaks = c(42,43,44)) +
+  labs(
+    x = "ESM measurement occasion",
+    y = "Negative Emotion Intensity",
+    title = ""
+  ) +
+  theme_classic()+ geom_text(
+    data = interval_labels,
+    aes(x = x_mid, y = y_mid, label = label),
+    inherit.aes = FALSE,
+    vjust = 1, size = 5
+  )+#theme(legend.position = "none")
+  theme(
+    legend.position = c(0.95, 0.95),   # near top-right inside the panel
+    legend.justification = c("right", "top"),
+    legend.background = element_rect(fill = alpha("white", 0.7)) # optional for readability
+  )+ annotate(
+    "label",
+    x = 42, y = 35,   # adjust to place in top right
+    hjust = 0, 
+    vjust = 1,
+    label = "Legend\nΔI: Change in Overall Intensity\nΔT: Negative Emotion Transition",
+    size = 4,      # text size
+    label.size = 0.5 # border thickness
+  )
