@@ -41,14 +41,23 @@ if (file.exists(filepathEMOTE)){
 # However, the full dataset contains 6 negative emotions.
 # We have requested the 6 negative emotion items from EMOTE under data request code "C7SC6HWU8R"
 # with which you can request the same dataset from EMOTE (https://emotedatabase.com/)
-bInternet <- is.character(getURL("github.com"))
+
+# A wrapper to check whether you have an internet connection 
+has_internet <- function(url = "https://osf.io") {
+  tryCatch({
+    getURL(url, timeout = 5)
+    TRUE
+  }, error = function(e) FALSE)
+}
+
+bInternet <- has_internet("github.com")
 if (bInternet){
   source("https://github.com/taktsun/dissimilarity-for-ESM-data/raw/main/BrayCurtisDissimilarity_Calculate.R")
 }else{
   source("temp/BrayCurtisDissimilarity_Calculate.R")
 }
 
-bInternet <- is.character(getURL("osf.io"))
+bInternet <- has_internet("osf.io")
 if (bInternet){
   # be careful about time-out errors!
   # If needed, download these datasets to your local drive to load them...
