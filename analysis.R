@@ -15,6 +15,7 @@ library(ggpubr)
 library(viridis) 
 library(colorspace)
 library(emodiff)
+library(RColorBrewer)
 
 # ===========================================================================
 # Main Analysis: Model 1 and Model 2 in their original specifications
@@ -245,12 +246,6 @@ if (file.exists(filepathEMOTE)) strLOOmap2 <- c(strLOOmap2,
 dfoutcoreLOO$label <- strLOOmap2[ match(dfoutcoreLOO$dataset, strLOOmap1) ]
 
 
-# Prepare extra empty rows so that there will be spaces between datasets
-extra_rows <- data.frame(dataset = c("df.0s0","df.1s9", "df.2s9"),
-                         label = c("","",""),
-                         # replicate NA for all other columns in df_plot
-                         lapply(df_plot[ , !(names(df_plot) %in% c("dataset","label"))], 
-                                function(x) NA))
 
 
 # Plot for Hypothesis 1
@@ -266,6 +261,13 @@ df_plot <- dfoutcoreLOO %>%
   # Lock a single, consistent y mapping for BOTH geoms
   mutate(dataset = factor(dataset, levels = unique(dataset)))
 graphlabelLOO <- "Hypothesis 1: Negative Emotion Transitions \nPredicting Changes in Overall Emotion Intensity"
+
+# Prepare extra empty rows so that there will be spaces between datasets
+extra_rows <- data.frame(dataset = c("df.0s0","df.1s9", "df.2s9"),
+                         label = c("","",""),
+                         # replicate NA for all other columns in df_plot
+                         lapply(df_plot[ , !(names(df_plot) %in% c("dataset","label"))], 
+                                function(x) NA))
 
 # Bind them to the existing dataframe
 df_plot <- rbind(df_plot, extra_rows)
