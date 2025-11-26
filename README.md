@@ -101,6 +101,8 @@ If this happens, run these in addition to what described in step 4:
 
 	    install.packages("remotes")
 	    remotes::install_github("wviechtb/esmpack")
+	    install.packages("devtools")
+	    devtools::install_github("seanchrismurphy/emodiff")
 	    install.packages()	    
 
 
