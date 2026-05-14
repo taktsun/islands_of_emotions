@@ -1,7 +1,8 @@
 
 # Readme <a href='https://osf.io/zcvbs/'><img src='worcs_icon.png' align="right" height="139" /></a>
 
-This is the github of my manuscript "Negative Emotion Transitions May Have Immediate Benefits in Decreasing Negative Emotions in Daily Life". You can reproduce the analysis results in the manuscript following this readme.
+This is the github of my manuscript "Negative Emotion Transitions Are Temporally Close to Reductions in Overall Negative Emotion Intensity in Daily Life". You can reproduce the analysis results in the manuscript following this readme.
+Last updated: 2026-05-14
 
 ## Data availability
 
