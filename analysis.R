@@ -88,6 +88,41 @@ output_coremm<- rbind(
   coredf3)
 write.csv(output_coremm, paste0("manuscript/results/res_mm_mainanalysis_Table3TableS5_",Sys.Date(),".csv"))
 
+# Re-run models in ML method (but not REML) so that likelihood ratio test between Model 1 & 2 can be conducted
+
+mm1ML <- function (df){
+  lme(fixed=moment_NA ~ moment_NA_bray.bal.succw+moment_NA_bray.gra.succw+moment_NAcwL1D+timecw+
+        moment_NA_bray.bal.succb+moment_NA_bray.gra.succb,
+      data=df, method = "ML",
+      random=~1+ moment_NA_bray.bal.succw+moment_NA_bray.gra.succw+moment_NAcwL1D | ppnr, correlation = corAR1(),
+      control =list(msMaxIter = 1000, msMaxEval = 1000, opt = "optim"),na.action = na.omit)
+}
+mm2ML <- function (df){
+  lme(fixed=moment_NA ~ (moment_NA_bray.bal.succw+moment_NA_bray.gra.succw)*person_CESD +timecw+
+        moment_NA_bray.bal.succb+moment_NA_bray.gra.succb + moment_NAcwL1D,
+      data=df, method = "ML",
+      random=~1+ (moment_NA_bray.bal.succw+moment_NA_bray.gra.succw)*person_CESD+ moment_NAcwL1D | ppnr, correlation = corAR1(),
+      control =list(msMaxIter = 1000, msMaxEval = 1000, opt = "optim"),na.action = na.omit)
+}
+
+
+m1_ml.df1  <- mm1ML(df.1)
+m2_ml.df1   <- mm2ML(df.1)
+m1_ml.df2  <- mm1ML(df.2)
+m2_ml.df2   <- mm2ML(df.2)
+m1_ml.df3  <- mm1ML(df.3)
+m2_ml.df3  <- mm2ML(df.3)
+compareM1M2.df1 <- anova(m1_ml.df1, m2_ml.df1)
+compareM1M2.df2 <-anova(m1_ml.df2, m2_ml.df2)
+compareM1M2.df3 <-anova(m1_ml.df3, m2_ml.df3)
+
+# Save likelihood ratios and p-values
+write.csv((rbind(c("dataset1",compareM1M2.df1$L.Ratio[2],compareM1M2.df1$`p-value`[2]),
+                 c("dataset2",compareM1M2.df2$L.Ratio[2],compareM1M2.df2$`p-value`[2]),
+                 c("dataset3",compareM1M2.df3$L.Ratio[2],compareM1M2.df3$`p-value`[2]))),
+          paste0("temp/res_mm_comparison_",Sys.Date(),".csv"))
+
+
 # ===========================================================================
 # Sensitivity Analysis: Alternative model specifications (Table S7.1 and S7.2)
 # ===========================================================================
@@ -688,3 +723,130 @@ output_manyEDmm<- rbind(
 write.csv(output_manyEDmm, paste0("manuscript/results/res_mm_sensitivity_TableS73_",Sys.Date(),".csv"))
 
 
+#======================
+# Sensitivity Analysis: Time-Lagged Models 
+#======================
+library(esmpack) # for the lagvar function
+
+# Creating lagged negative emotion intensity successive difference (i.e., NA@t-1 - NA@t-2)
+df.1$moment_NAcwL2D <- lagvar(moment_NAcwL1D,ppnr,obs=triggerid,day=day, data = df.1)
+df.1$moment_NAdiffL1D <- df.1$moment_NAcwL1D - df.1$moment_NAcwL2D
+
+df.2$moment_NAcwL2D <- lagvar(moment_NAcwL1D,ppnr,obs=triggerid,day=day, data = df.2)
+df.2$moment_NAdiffL1D <- df.2$moment_NAcwL1D - df.2$moment_NAcwL2D
+
+df.3$moment_NAcwL2D <- lagvar(moment_NAcwL1D,ppnr,obs=triggerid,day=day, data = df.3)
+df.3$moment_NAdiffL1D <- df.3$moment_NAcwL1D - df.3$moment_NAcwL2D
+
+
+# Creating lagged variables on emotion variability
+# Bray-Curtis dissimilarity full index
+df.1$moment_NA_bray.all.succwL1D <- lagvar(moment_NA_bray.all.succw,ppnr,obs=triggerid,day=day, data = df.1)
+df.2$moment_NA_bray.all.succwL1D <- lagvar(moment_NA_bray.all.succw,ppnr,obs=triggerid,day=day, data = df.2)
+df.3$moment_NA_bray.all.succwL1D <- lagvar(moment_NA_bray.all.succw,ppnr,obs=triggerid,day=day, data = df.3)
+
+# Emotion transition (replacement subcomponent)
+df.1$moment_NA_bray.bal.succwL1D <- lagvar(moment_NA_bray.bal.succw,ppnr,obs=triggerid,day=day, data = df.1)
+df.2$moment_NA_bray.bal.succwL1D <- lagvar(moment_NA_bray.bal.succw,ppnr,obs=triggerid,day=day, data = df.2)
+df.3$moment_NA_bray.bal.succwL1D <- lagvar(moment_NA_bray.bal.succw,ppnr,obs=triggerid,day=day, data = df.3)
+
+# Nestedness subcomponent
+df.1$moment_NA_bray.gra.succwL1D <- lagvar(moment_NA_bray.gra.succw,ppnr,obs=triggerid,day=day, data = df.1)
+df.2$moment_NA_bray.gra.succwL1D <- lagvar(moment_NA_bray.gra.succw,ppnr,obs=triggerid,day=day, data = df.2)
+df.3$moment_NA_bray.gra.succwL1D <- lagvar(moment_NA_bray.gra.succw,ppnr,obs=triggerid,day=day, data = df.3)
+
+# Tally missingness for overnight comparison
+df.1$moment_NA_bray.all.succwL1D[is.na(df.1$moment_NAdiffL1D)] <- NA
+df.1$moment_NA_bray.bal.succwL1D[is.na(df.1$moment_NAdiffL1D)] <- NA
+df.1$moment_NA_bray.gra.succwL1D[is.na(df.1$moment_NAdiffL1D)] <- NA
+
+df.2$moment_NA_bray.all.succwL1D[is.na(df.2$moment_NAdiffL1D)] <- NA
+df.2$moment_NA_bray.bal.succwL1D[is.na(df.2$moment_NAdiffL1D)] <- NA
+df.2$moment_NA_bray.gra.succwL1D[is.na(df.2$moment_NAdiffL1D)] <- NA
+
+df.3$moment_NA_bray.all.succwL1D[is.na(df.3$moment_NAdiffL1D)] <- NA
+df.3$moment_NA_bray.bal.succwL1D[is.na(df.3$moment_NAdiffL1D)] <- NA
+df.3$moment_NA_bray.gra.succwL1D[is.na(df.3$moment_NAdiffL1D)] <- NA
+
+# Testing the main hypotheses (H1 & H2) with Model 1 and Model 2
+# Lagged transition predicting intensity change from t-1 to t
+mm1L1D <- function (df){
+  lme(fixed=moment_NA ~ moment_NA_bray.bal.succwL1D+moment_NA_bray.gra.succwL1D+moment_NAcwL1D+timecw+
+        moment_NA_bray.bal.succb+moment_NA_bray.gra.succb,
+      data=df,
+      random=~1+ moment_NA_bray.bal.succwL1D+moment_NA_bray.gra.succwL1D+moment_NAcwL1D | ppnr, correlation = corAR1(),
+      control =list(msMaxIter = 1000, msMaxEval = 1000, opt = "optim"),na.action = na.omit)
+}
+mm2L1D <- function (df){
+  lme(fixed=moment_NA ~ (moment_NA_bray.bal.succwL1D+moment_NA_bray.gra.succwL1D)*person_CESD +timecw+
+        moment_NA_bray.bal.succb+moment_NA_bray.gra.succb + moment_NAcwL1D,
+      data=df,
+      random=~1+ (moment_NA_bray.bal.succwL1D+moment_NA_bray.gra.succwL1D)*person_CESD+ moment_NAcwL1D | ppnr, correlation = corAR1(),
+      control =list(msMaxIter = 1000, msMaxEval = 1000, opt = "optim"),na.action = na.omit)
+}
+
+# Lagged difference scores (from t-2 to t-1) predicting transitions from t-1 to t
+mm1L1Drev <- function (df){
+  lme(fixed=moment_NA_bray.all.suc ~ moment_NAdiffL1D +moment_NA_bray.gra.succw +timecw+
+        moment_NA_bray.gra.succb,
+      data=df,
+      # we did not include the random effects of moment_NA_bray.gra.succw, because it brings converging problems for datasets 1 & 2
+      # random=~1+ moment_NAdiffL1D+moment_NA_bray.gra.succw | ppnr, correlation = corAR1(),
+      random=~1+ moment_NAdiffL1D | ppnr, correlation = corAR1(),
+      control =list(msMaxIter = 1000, msMaxEval = 1000, opt = "optim"),na.action = na.omit)
+}
+mm2L1Drev <- function (df){
+  lme(fixed=moment_NA_bray.all.suc ~ (moment_NAdiffL1D+moment_NA_bray.gra.succw)*person_CESD +timecw+
+        moment_NA_bray.gra.succb,
+      data=df,
+      # we did not include the random effects of moment_NA_bray.gra.succw, because it brings converging problems for datasets 1 & 2
+      # random=~1+ (moment_NAdiffL1D+moment_NA_bray.gra.succw)*person_CESD | ppnr, correlation = corAR1(),
+      random=~1+ (moment_NAdiffL1D)*person_CESD | ppnr, correlation = corAR1(),
+      control =list(msMaxIter = 1000, msMaxEval = 1000, opt = "optim"),na.action = na.omit)
+}
+
+
+L1Dmm <- function(dfmm){
+  
+  mm_H1 <- mm1L1D(dfmm)
+  mm_H2 <- mm2L1D(dfmm)
+  
+  rbind(
+    preparemmresult(mm_H1),
+    preparemmresult(mm_H2)
+  )
+}
+
+L1Drevmm <- function(dfmm){
+  
+  mm_H1 <- mm1L1Drev(dfmm)
+  mm_H2 <- mm2L1Drev(dfmm)
+  
+  rbind(
+    preparemmresult(mm_H1),
+    preparemmresult(mm_H2)
+  )
+}
+
+
+# Run main analyses for the 3 datasets
+mmL1Ddf1<- cbind(dataset="DF1",L1Dmm(df.1))
+mmL1Ddf2<- cbind(dataset="DF2",L1Dmm(df.2))
+mmL1Ddf3<- cbind(dataset="DF3",L1Dmm(df.3))
+
+
+mmL1Drevdf1<- cbind(dataset="DF1",L1Drevmm(df.1))
+mmL1Drevdf2<- cbind(dataset="DF2",L1Drevmm(df.2))
+mmL1Drevdf3<- cbind(dataset="DF3",L1Drevmm(df.3))
+
+# Bind them and output
+output_mmL1D<- rbind(
+  mmL1Ddf1,
+  mmL1Ddf2,
+  mmL1Ddf3,
+  mmL1Drevdf1,
+  mmL1Drevdf2,
+  mmL1Drevdf3
+)
+
+write.csv(output_mmL1D, paste0("temp/res_mm_L1D_",Sys.Date(),".csv"))
